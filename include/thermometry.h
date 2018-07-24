@@ -27,11 +27,13 @@ void thermometry_set_threshold(uint8_t cooling_deg, uint8_t fatal_deg);
 
 /**
  * 设置过温回调
+ * @param void thermometry_callback(fatal_deg, current_deg)
  */ 
 void thermometry_set_excess_callback(thermometry_callback handler);
 
 /**
  * 设置冷却回调
+ * @param void thermometry_callback(cooling_deg, current_deg)
  */ 
 void thermometry_set_cooling_callback(thermometry_callback handler);
 
