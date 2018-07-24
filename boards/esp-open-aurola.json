@@ -1,0 +1,31 @@
+{
+  "build": {
+    "cpu": "cortex-m0",
+    "extra_flags": "-DSTM32F051x8",
+    "f_cpu": "48000000L",
+    "mcu": "stm32f051c8t6"
+  },
+  "debug": {
+    "default_tools": [
+      "jlink"
+    ],
+    "openocd_target": "stm32f0x",
+    "svd_path": "STM32F0xx.svd"
+  },
+  "frameworks": [
+    "stm32cube"
+  ],
+  "name": "ESP Open Aurola Board",
+  "upload": {
+    "maximum_ram_size": 8192,
+    "maximum_size": 65536,
+    "protocol": "jlink",
+    "protocols": [
+      "jlink",
+      "stlink",
+      "blackmagic"
+    ]
+  },
+  "url": "http://gitee.com/cksweb/esp-open-aurola",
+  "vendor": "cksweb"
+}
