@@ -56,6 +56,8 @@ static bool dev_init(TIM_HandleTypeDef *dev, TIM_TypeDef *tim) {
        //记录失败通道
         rst |= 8;
     }
+   
+    return rst;
  }
 
 
