@@ -11,8 +11,8 @@ static void dev_setup()
 {
 
     //开启时钟
-    __HAL_RCC_GPIOA_CLK_ENABLE(); //pwm1-4时钟
-    __HAL_RCC_GPIOB_CLK_ENABLE(); //pwm5-6时钟
+    __HAL_RCC_GPIOA_CLK_ENABLE(); //pwm0-3时钟
+    __HAL_RCC_GPIOB_CLK_ENABLE(); //pwm4-7时钟
 
     //端口共用配置
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -20,11 +20,21 @@ static void dev_setup()
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 
-    GPIO_InitStruct.Alternate = TIM1_GPIO_AF_CHANNEL1;
-    GPIO_InitStruct.Pin = PWM0_PIN;
+    //配置pwm0-3
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11;
+    GPIO_InitStruct.Alternate = GPIO_AF2_TIM1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 
+    //配置pwm4、5
+    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
+    GPIO_InitStruct.Alternate = GPIO_AF1_TIM3;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    //配置pwm6、7
+    GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+    GPIO_InitStruct.Alternate = GPIO_AF1_TIM3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 static bool dev_init(TIM_HandleTypeDef *dev, TIM_TypeDef *tim) 
@@ -157,9 +167,9 @@ void pwm_start(bool fade_in)
     HAL_TIM_PWM_Start(&pwm_dev0, TIM_CHANNEL_4);
 
     HAL_TIM_PWM_Start(&pwm_dev1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&pwm_dev2, TIM_CHANNEL_2);
-    HAL_TIM_PWM_Start(&pwm_dev3, TIM_CHANNEL_3);
-    HAL_TIM_PWM_Start(&pwm_dev4, TIM_CHANNEL_4);
+    HAL_TIM_PWM_Start(&pwm_dev1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&pwm_dev1, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&pwm_dev1, TIM_CHANNEL_4);
 }
 
 void pwm_stop()
@@ -168,9 +178,9 @@ void pwm_stop()
     HAL_TIM_PWM_Stop(&pwm_dev0, TIM_CHANNEL_2);
     HAL_TIM_PWM_Stop(&pwm_dev0, TIM_CHANNEL_3);
     HAL_TIM_PWM_Stop(&pwm_dev0, TIM_CHANNEL_4);
-
+ 
     HAL_TIM_PWM_Stop(&pwm_dev1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Stop(&pwm_dev2, TIM_CHANNEL_2);
-    HAL_TIM_PWM_Stop(&pwm_dev3, TIM_CHANNEL_3);
-    HAL_TIM_PWM_Stop(&pwm_dev4, TIM_CHANNEL_4);
+    HAL_TIM_PWM_Stop(&pwm_dev1, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Stop(&pwm_dev1, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Stop(&pwm_dev1, TIM_CHANNEL_4);
 }
