@@ -44,11 +44,6 @@ void pwm_set_duty(uint8_t ch_idx, uint16_t duty);
 void pwm_set_all_dutys(uint16_t duty);
 
 /**
- * 重启PWM模块
- */ 
-void pwm_restart();
-
-/**
  * 启动PWM模块
  * @param fade_in 是否渐亮
  */ 
