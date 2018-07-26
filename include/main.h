@@ -5,6 +5,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
 
+#include "fan.h"
+#include "hwclock.h"
+#include "instensity.h"
+#include "thermometry.h"
+#include "cmd_bridge.h"
+
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

@@ -37,7 +37,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "dev/stm32f0xx_it.h"
+#include "periph/stm32f0xx_it.h"
 
 /** @addtogroup STM32F0xx_HAL_Examples
   * @{

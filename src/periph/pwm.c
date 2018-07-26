@@ -1,4 +1,4 @@
-#include "dev/pwm.h"
+#include "periph/pwm.h"
 
 uint16_t curr_dutys[MAX_PWM_PINS];
 

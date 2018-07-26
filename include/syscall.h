@@ -1,8 +1,8 @@
-#ifndef __I2C_H
-#define __I2C_H
+#ifndef __SYSCALL_H
+#define __SYSCALL_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif 
 
 
