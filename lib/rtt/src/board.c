@@ -16,6 +16,12 @@
 
 #include "stm32f0xx.h"
 
+#define STM32_HEAP_BEGIN __bss_end__
+#define STM32_SRAM_SIZE 8
+#define STM32_SRAM_END (0x20000000 + STM32_SRAM_SIZE * 1024)
+
+
+extern uint32_t __bss_end__;
 
 /**
  * This function will initial STM32 board.

@@ -105,7 +105,7 @@
 // </c>
 // <c1>Dynamic Heap Management
 //  <i>Dynamic Heap Management
-//#define RT_USING_HEAP
+#define RT_USING_HEAP
 // </c>
 // <c1>using small memory
 //  <i>using small memory
@@ -129,7 +129,7 @@
 // <s>The device name for console
 //  <i>The device name for console
 //  <i>Default: uart1
-#define RT_CONSOLE_DEVICE_NAME      "uart2"
+#define RT_CONSOLE_DEVICE_NAME      "uart1"
 // </h>
 
 
@@ -165,6 +165,6 @@
 // <<< end of configuration section >>>
 
 #define RT_USING_UART
-#define RT_USING_UART2
+// #define RT_USING_UART2
 
 #endif

@@ -27,7 +27,7 @@
 
 #include <rtconfig.h>
 
-#if defined(RT_USING_NEWLIB) || defined(_WIN32)
+#if defined(RT_USING_NEWLIB) || defined(_WIN32) ||defined(__GNUC__)
 /* use errno.h file in newlib */
 #include <errno.h>
 #else
