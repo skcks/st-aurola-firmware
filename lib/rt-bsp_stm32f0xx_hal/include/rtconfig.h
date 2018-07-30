@@ -120,7 +120,7 @@
 // <h>Console Configuration
 // <c1>Using console
 //  <i>Using console
-//#define RT_USING_CONSOLE
+#define RT_USING_CONSOLE
 // </c>
 // <o>the buffer size of console <1-1024>
 //  <i>the buffer size of console
@@ -165,6 +165,6 @@
 // <<< end of configuration section >>>
 
 #define RT_USING_UART
-// #define RT_USING_UART2
+#define RT_USING_UART1
 
 #endif

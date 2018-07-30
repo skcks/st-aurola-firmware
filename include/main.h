@@ -3,7 +3,7 @@
 #define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx_hal.h"
+#include "board.h"
 
 #include "fan.h"
 #include "hwclock.h"

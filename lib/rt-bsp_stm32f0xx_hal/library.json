@@ -1,0 +1,7 @@
+{
+    "name": "rt-bsp_stm32f0xx_hal",
+    "desciption": "the bsp of rt-thread",
+    "dependencies": [
+        {"name": "rt-thread", "veresion": "3.0.3"}
+    ]
+}
