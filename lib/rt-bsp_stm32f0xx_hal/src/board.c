@@ -13,12 +13,14 @@
  */
 #include "board.h"
 
-#define STM32_HEAP_BEGIN __bss_end__
+#define Stack_Size 0x400
+#define STM32_HEAP_BEGIN (__bss_end__ + Stack_Size)
 #define STM32_SRAM_SIZE 8
 #define STM32_SRAM_END (0x20000000 + STM32_SRAM_SIZE * 1024)
 
 
-extern uint32_t __bss_end__;
+extern uint32_t __bss_end__ ;
+
 static void SystemClock_Config();
 
 /**
