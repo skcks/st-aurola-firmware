@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stm32f0xx_hal.h>
 
-#include <log.h>
+#include "log.h"
 
 #ifdef __cplusplus
  extern "C" {
