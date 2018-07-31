@@ -1,5 +1,8 @@
 {
     "name": "rt-thread",
     "veresion": "3.0.3",
-    "desciption": "rt-thread rtos integration"
+    "desciption": "rt-thread rtos integration",
+    "build": {
+        "libArchive": false
+    }
 }

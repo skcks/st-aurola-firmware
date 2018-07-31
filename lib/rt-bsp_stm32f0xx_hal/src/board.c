@@ -13,13 +13,13 @@
  */
 #include "board.h"
 
-#define Stack_Size 0x400
-#define STM32_HEAP_BEGIN (__bss_end__ + Stack_Size)
+#define STM32_HEAP_BEGIN (&__bss_end__)
 #define STM32_SRAM_SIZE 8
-#define STM32_SRAM_END (0x20000000 + STM32_SRAM_SIZE * 1024)
+#define STM32_SRAM_END (0x20000000 + STM32_SRAM_SIZE * 1024 - _Min_Stack_Size)
 
-
+extern uint32_t _estack;
 extern uint32_t __bss_end__ ;
+extern uint32_t _Min_Stack_Size;
 
 static void SystemClock_Config();
 
@@ -28,8 +28,13 @@ static void SystemClock_Config();
  */
 void rt_hw_board_init()
 {    
+    HAL_Init();
+
 	SystemClock_Config();
-	SysTick_Config(SystemCoreClock / RT_TICK_PER_SECOND);
+
+#if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
+    rt_system_heap_init((void*)STM32_HEAP_BEGIN, (void*)STM32_SRAM_END);
+#endif
 
     /* Call components board initial (use INIT_BOARD_EXPORT()) */
 #ifdef RT_USING_COMPONENTS_INIT
@@ -40,9 +45,7 @@ void rt_hw_board_init()
 	rt_console_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
     
-#if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
-    rt_system_heap_init((void*)STM32_HEAP_BEGIN, (void*)STM32_SRAM_END);
-#endif
+
 }
 
 void SysTick_Handler(void)
@@ -54,6 +57,22 @@ void SysTick_Handler(void)
 
 	/* leave interrupt */
 	rt_interrupt_leave();
+}
+
+void HAL_MspInit(void)
+{
+    __HAL_RCC_SYSCFG_CLK_ENABLE();
+    __HAL_RCC_PWR_CLK_ENABLE();
+
+    /* System interrupt init*/
+    /* SVC_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(SVC_IRQn, 0, 0);
+    /* PendSV_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
+    /* SysTick_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+
+    
 }
 
 static void SystemClock_Config() 
@@ -86,7 +105,7 @@ static void SystemClock_Config()
     }
 
     /* Configure the Systick interrupt time */
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
+    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / RT_TICK_PER_SECOND);
 
     /* Configure the Systick */
     HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);

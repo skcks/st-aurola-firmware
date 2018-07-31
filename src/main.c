@@ -6,7 +6,6 @@
 
 int main(void)
 {
-  HAL_Init();
   
   LED_GPIO_CLK_ENABLE();
   

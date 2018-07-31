@@ -3,5 +3,8 @@
     "desciption": "the finsh is a component of rt-thread",
     "dependencies": [
         {"name": "rt-thread", "veresion": "3.0.3"}
-    ]
+    ],
+    "build": {
+        "libArchive": false
+    }
 }
