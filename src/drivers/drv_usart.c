@@ -52,37 +52,36 @@ static void uart_irq_handler(struct stm32_uart* uart)
     
     level = rt_hw_interrupt_disable();
  
-    if ((__HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_RXNE) != RESET) && 
-            (__HAL_UART_GET_IT_SOURCE(&uart->huart, UART_IT_RXNE) != RESET)) 
+   
+    if (__HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_RXNE) != RESET)
     {
-
-        if (__HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_RXNE) != RESET)
+        uart->rx_buffer[uart->save_index] = (rt_uint8_t)(uart->huart.Instance->RDR & 0xff);
+        uart->save_index ++;
+        if (uart->save_index >= RT_UART_RX_BUFFER_SIZE)
         {
-            uart->rx_buffer[uart->save_index] = (rt_uint8_t)(uart->huart.Instance->RDR & 0xff);
-            uart->save_index ++;
-            if (uart->save_index >= RT_UART_RX_BUFFER_SIZE)
-            {
-                uart->save_index = 0;
-            }
+            uart->save_index = 0;
         }
+    
+
+        /* invoke callback */
+        if (uart->parent.rx_indicate != RT_NULL)
+        {
+            rt_size_t length;
+            if (uart->read_index > uart->save_index)
+                length = RT_UART_RX_BUFFER_SIZE - uart->read_index + uart->save_index;
+            else
+                length = uart->save_index - uart->read_index;
+
+            uart->parent.rx_indicate(&uart->parent, length);
+        }
+
+    }
+
+    if (__HAL_UART_GET_IT(&uart->huart, UART_IT_RXNE) == SET) {
+        
     }
 
     rt_hw_interrupt_enable(level);
-    
-    /* invoke callback */
-    if (uart->parent.rx_indicate != RT_NULL)
-    {
-        rt_size_t length;
-        if (uart->read_index > uart->save_index)
-            length = RT_UART_RX_BUFFER_SIZE - uart->read_index + uart->save_index;
-        else
-            length = uart->save_index - uart->read_index;
-
-        uart->parent.rx_indicate(&uart->parent, length);
-    }
-
-    __HAL_UART_CLEAR_FLAG(&uart->huart, UART_FLAG_RXNE);
-
     /* leave interrupt */
     rt_interrupt_leave();
 }
@@ -117,7 +116,6 @@ static void uart_io_init(UART_HandleTypeDef *huart)
         PA9  ------> USART1_RX 
         */
         GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_9;
-        GPIO_InitStruct.Alternate = GPIO_AF1_USART1;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
         GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -152,6 +150,8 @@ static void uart_io_init(UART_HandleTypeDef *huart)
 
 static void uart_hal_init(UART_HandleTypeDef *huart)
 {
+    __HAL_RCC_USART1_CLK_ENABLE();
+
     UART_InitTypeDef *UART_InitStruct = &huart->Init;
 
     UART_InitStruct->BaudRate = 115200;
@@ -161,7 +161,9 @@ static void uart_hal_init(UART_HandleTypeDef *huart)
     UART_InitStruct->Mode = UART_MODE_TX_RX;
     UART_InitStruct->HwFlowCtl = UART_HWCONTROL_NONE;
     UART_InitStruct->OverSampling = UART_OVERSAMPLING_16;
-    
+    UART_InitStruct->OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+    huart->AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+
     HAL_StatusTypeDef rst = HAL_UART_Init(huart);
     
     RT_ASSERT(rst == HAL_OK);
@@ -193,6 +195,7 @@ static rt_err_t rt_uart_open(rt_device_t dev, rt_uint16_t oflag)
 
         /* enable interrupt */
         __HAL_UART_ENABLE_IT(&uart->huart, USART_IT_RXNE);
+        __HAL_UART_ENABLE(&uart->huart);
     }
 
     return RT_EOK;
@@ -211,6 +214,8 @@ static rt_err_t rt_uart_close(rt_device_t dev)
 
           /* disable interrupt */
         __HAL_UART_DISABLE_IT(&uart->huart, USART_IT_RXNE);
+        __HAL_UART_DISABLE(&uart->huart);
+
     }
 
     return RT_EOK;
@@ -271,19 +276,23 @@ static rt_size_t rt_uart_write(rt_device_t dev, rt_off_t pos, const void* buffer
 
     if (dev->open_flag & RT_DEVICE_FLAG_STREAM)
     {
+        CLEAR_BIT(uart->huart.Instance->CR1, (USART_CR1_PEIE | USART_CR1_TXEIE));
+        CLEAR_BIT(uart->huart.Instance->CR3, USART_CR3_EIE);
+
         /* stream mode */
         while (size)
         {
             if (*ptr == '\n')
             {
-                while (RESET == __HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_TXE));
+                while (RESET == __HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_TXE)) {};
+
                 //填入换行符
                 uart->huart.Instance->TDR = '\r'; 
    
             }
 
             //等待发送
-            while (RESET == __HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_TXE));
+            while (RESET == __HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_TXE)) {}
 
             //填入新数据
             uart->huart.Instance->TDR = *ptr; 
@@ -297,7 +306,7 @@ static rt_size_t rt_uart_write(rt_device_t dev, rt_off_t pos, const void* buffer
         while (size)
         {
             //等待发送
-            while (RESET == __HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_TXE));
+            while (RESET == __HAL_UART_GET_FLAG(&uart->huart, UART_FLAG_TXE)){}
 
             //填入新数据
             uart->huart.Instance->TDR = *ptr; 

@@ -15,7 +15,7 @@
 
 #define STM32_HEAP_BEGIN (&__bss_end__)
 #define STM32_SRAM_SIZE 8
-#define STM32_SRAM_END (0x20000000 + STM32_SRAM_SIZE * 1024 - _Min_Stack_Size)
+#define STM32_SRAM_END (&_estack - 0x400)
 
 extern uint32_t _estack;
 extern uint32_t __bss_end__ ;
@@ -52,7 +52,7 @@ void SysTick_Handler(void)
 {
 	/* enter interrupt */
 	rt_interrupt_enter();
-
+    HAL_IncTick();
 	rt_tick_increase();
 
 	/* leave interrupt */
@@ -71,7 +71,7 @@ void HAL_MspInit(void)
     HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
     /* SysTick_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-
+    
     
 }
 
@@ -90,7 +90,7 @@ static void SystemClock_Config()
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
         /* Log Error */
-        rt_kprintf("hse err!");
+        //rt_kprintf("hse err!");
     }
 
     /* Select PLL as system clock source and configure the HCLK, PCLK1 clocks dividers */
@@ -101,7 +101,7 @@ static void SystemClock_Config()
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
     {
          /* Log Error */
-        rt_kprintf("clock src err!");
+        //rt_kprintf("clock src err!");
     }
 
     /* Configure the Systick interrupt time */
